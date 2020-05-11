@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验5</title>
+    <script src="../jquery-3.4.1.js"></script>
+    <style>
+        div {
+            width: 700px;
+            text-align: center;
+            margin: auto;
+        }
+
+        [type="submit"] {
+            margin: auto;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 400px;
+            border: 1px solid gray;
+            border-collapse: collapse;
+            margin: 50px auto;
+        }
+
+        td {
+            border: 1px solid gray;
+        }
+
+        span {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <label for="stuNo">学号</label><input type="text" name="" id="stuNo">
+        <label for="stuName">姓名</label><input type="text" name="" id="stuName">
+        <label for="stuMajor">专业年级</label><input type="text" name="" id="stuMajor">
+        <input type="submit" value="确定" id="submit">
+        <hr>
+
+        <table id="tb1">
+            <tr>
+                <td>学号</td>
+                <td>姓名</td>
+                <td>专业年级</td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        // 取出数据
+        $(function () {
+            $.get(
+                "http://47.106.163.137/stu/getStuList",
+                function (data) {
+                    for (let i = 0; i < data.length; i++) {
+                        $("#tb1").append("<tr><td>" + data[i].stuNo + "</td><td>" + data[i].stuName + "</td><td>"
+                            + data[i].stuMajor + "</td><td><span onclick=Delete(this,"+data[i].stuNo+")>删除</span></td></tr>")
+                    }
+                },
+                'json'
+            )
+        })
+
+        // 添加保存
+        $("#submit").click(function () {
+            var student = {
+                stuNo: $("#stuNo").val(),
+                stuName: $("#stuName").val(),
+                stuMajor: $("#stuMajor").val()
+            }
+            $.get(
+                "http://47.106.163.137/stu/InsertStu",
+                {
+                    data: JSON.stringify(student),
+                },
+
+                function (data) {
+                    if (data == "success") {
+                        $("#tb1").append("<tr><td>" + $('#stuNo').val() + "</td><td>" + $('#stuName').val() + "</td><td>"
+                            + $('#stuMajor').val() + "</td><td><span onclick=Delete(this,"+"$('#stuNo').val()"+")>删除</span></td></tr>")
+                    }
+                },
+                'json'
+            )
+        })
+
+        // 删除
+        function Delete(del,stuNo) {
+            $.post(
+                "http://47.106.163.137/stu/deleteStu",
+                {
+                    stuNo:stuNo
+                },
+                function(data){
+                    if(data=="success"){
+                        $(del).parent().parent().remove()
+                    }
+                }
+            )
+        }
+
+    </script>
+</body>
+
+</html>
